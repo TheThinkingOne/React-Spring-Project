@@ -20,7 +20,7 @@ public class TodoController {
 
     // 조회
     @GetMapping("/{tno}")
-    public TodoDTO get(@PathVariable("tno") Long tno) {
+    public TodoDTO get(@PathVariable(name = "tno") Long tno) {
         return todoService.get(tno);
     }
 
@@ -55,6 +55,7 @@ public class TodoController {
         // /{tno} 와 todoDTO 안의 tno가 일치하는지 확인
         todoDTO.setTno(tno);
 
+        log.info("Modify: " + todoDTO);
         todoService.modify(todoDTO);
 
         return Map.of("RESULT", "SUCCESS");
@@ -62,7 +63,10 @@ public class TodoController {
     }
 
     @DeleteMapping("/{tno}")
-    public Map<String, String> remove(@PathVariable Long tno) {
+    public Map<String, String> remove( @PathVariable(name="tno") Long tno ){
+
+        log.info("Remove:  " + tno);
+
         todoService.remove(tno);
 
         return Map.of("RESULT", "SUCCESS");
