@@ -10,7 +10,7 @@ import java.util.stream.IntStream;
 @Data
 public class PageResponseDTO<E> {
 
-    private List<E> dtoList; // 현재 페이지에 표시될 데이터 목록
+    private List<E> dtoList; // 현재 페이지에 표시될 데이터 목록(게시글, 상품, 댓글 등등)
 
     private List<Integer> pageNumList; // 현재 페이지 주변에 표시될 페이지 번호 목록
     // ex [1,2,3,4,5,6,7,...]
@@ -26,12 +26,12 @@ public class PageResponseDTO<E> {
     // ex 전체 개시글이 132개면 totalCount = 132, totalPage = 14
 
     @Builder(builderMethodName = "withAll")
-    public PageResponseDTO(List<E> dtoList, PageRequestDTO pageRequestDTO, long total) {
+    public PageResponseDTO(List<E> dtoList, PageRequestDTO pageRequestDTO, long totalCount) {
         // 페이지에 관환 정보를 담는 DTO 생성자
 
         this.dtoList = dtoList;
         this.pageRequestDTO = pageRequestDTO;
-        this.totalCount = (int) total; // 다운캐스팅
+        this.totalCount = (int) totalCount; // 다운캐스팅
 
         // 페이지네이션 계산
 

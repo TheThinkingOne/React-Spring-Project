@@ -10,7 +10,7 @@ import lombok.experimental.SuperBuilder;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PageRequestDTO {
+public class PageRequestDTO { // 페이지 요청 DTO
 
     // 슈퍼빌드 사용하는 이유
     // 상속받을때
