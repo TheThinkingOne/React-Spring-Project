@@ -15,6 +15,7 @@ import org.zerock.apiserver.dto.ProductDTO;
 import org.zerock.apiserver.repository.ProductRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -100,7 +101,7 @@ public class ProductServiceImpl implements ProductService {
 
         List<String> uploadFileNames = productDTO.getUploadFileNames();
         // 엔티티 안에 있는 컬렉션을 새로 만들면 문제가 커짐
-        if(uploadFileNames == null || uploadFileNames.size() == 0) {
+        if(uploadFileNames == null || uploadFileNames.isEmpty()) {
             return product;
         }
 
@@ -109,6 +110,82 @@ public class ProductServiceImpl implements ProductService {
         });
 
         return product;
+    }
+
+    ///////////////////////////
+    @Override
+    public ProductDTO get(Long pno) { // 엔티티를 가져다가 DTO로 바꾸는 기능 필요
+
+        Optional<Product> result = productRepository.findById(pno);
+
+        Product product = result.orElseThrow();
+
+        return entityToDto(product);
+    }
+
+    private ProductDTO entityToDto(Product product) { // 엔티티를 가져다가 DTO로 바꾸는 기능 필요
+
+        ProductDTO productDTO = ProductDTO.builder()
+                .pno(product.getPno())
+                .pname(product.getPname())
+                .pdesc(product.getPdesc())
+                .price(product.getPrice())
+                .delFlag(product.isDelFlag())
+                .build();
+
+        List<ProductImage> imageList = product.getImageList();
+
+        if(imageList == null || imageList.isEmpty()) {
+            return productDTO;
+        }
+
+        // 저장된 이미지의 이름 문자열 조회?
+        List<String> fileNameList = imageList.stream().map(productImage ->
+                productImage.getFileName()).toList();
+
+        productDTO.setUploadFileNames(fileNameList);
+
+        return productDTO;
+        // 이미지 불러오기 어캐?
+    }
+
+    //////////////////////////////////////
+
+    @Override // 상품 게시글 정보 변경
+    public void modify(ProductDTO productDTO) {
+
+        // 조회
+        Optional<Product> result = productRepository.findById(productDTO.getPno());
+        // 변경 내용 반영
+        Product product = result.orElseThrow();
+        // 변경 내용 저장
+        product.changePrice(productDTO.getPrice());
+        product.changeName(productDTO.getPname());
+        product.changeDesc(productDTO.getPdesc());
+        product.changeDel(productDTO.isDelFlag());
+
+        // 이미지 처리(먼저 목록을 비워야 함)
+        List<String> uploadFileNames = productDTO.getUploadFileNames();
+        product.clearList();
+
+        if(uploadFileNames != null || !uploadFileNames.isEmpty()) {
+
+            uploadFileNames.forEach(uploadName -> {
+                product.addImageString(uploadName);
+            });
+        }
+
+        // 저장
+        productRepository.save(product);
+
+    }
+
+    //////////////////////////////////////////////
+
+    // 상품 게시글 삭제
+    @Override
+    public void remove(Long pno) { // 원래는 실제 삭제는 없다 원래는 진짜 삭제는 없다
+        productRepository.deleteById(pno);
     }
 
 }

@@ -14,6 +14,7 @@ import org.zerock.apiserver.util.CustomFileUtil;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 // 파일 업로드 관련 컨트롤러
 
@@ -26,23 +27,23 @@ public class ProductController {
 
     private final ProductService productService;
 
-    @PostMapping("/")
-    public Map<String, String> register(ProductDTO productDTO) {
-
-        // 파일업로드 관련해서 꼭 JSON 으로 전송하지 않는게 RESTFUL 하지 않은건가?
-        // 가이드라인일뿐 프로토콜이 있는건 아닌가?
-        log.info("register: " + productDTO);
-
-        List<MultipartFile> files = productDTO.getFiles();
-
-        List<String> uploadedFileNames = fileUtil.saveFiles(files);
-
-        productDTO.setUploadFileNames(uploadedFileNames);
-
-        log.info("uploadedFileNames: " + uploadedFileNames);
-
-        return Map.of("RESULT", "SUCCESS");
-    }
+//    @PostMapping("/")
+//    public Map<String, String> register(ProductDTO productDTO) {
+//
+//        // 파일업로드 관련해서 꼭 JSON 으로 전송하지 않는게 RESTFUL 하지 않은건가?
+//        // 가이드라인일뿐 프로토콜이 있는건 아닌가?
+//        log.info("register: " + productDTO);
+//
+//        List<MultipartFile> files = productDTO.getFiles();
+//
+//        List<String> uploadedFileNames = fileUtil.saveFiles(files);
+//
+//        productDTO.setUploadFileNames(uploadedFileNames);
+//
+//        log.info("uploadedFileNames: " + uploadedFileNames);
+//
+//        return Map.of("RESULT", "SUCCESS");
+//    }
 
     // 파일(이미지) 보는 컨트롤러
     @GetMapping("/view/{fileName}")
@@ -57,6 +58,76 @@ public class ProductController {
     public PageResponseDTO<ProductDTO> list(PageRequestDTO pageRequestDTO) {
         return productService.getList(pageRequestDTO);
     }
+
+    @PostMapping("/")
+    public Map<String, Long> register(ProductDTO productDTO) {
+        //List<MultipartFile> files = productDTO.getFiles();
+        List<MultipartFile> files = productDTO.getFiles();
+
+        List<String> uploadedFileNames = fileUtil.saveFiles(files);
+
+        productDTO.setUploadFileNames(uploadedFileNames);
+
+        log.info("uploadedFileNames: " + uploadedFileNames);
+
+        Long pno = productService.register(productDTO);
+
+        return Map.of("RESULT", pno);
+
+    }
+
+    @GetMapping("/{pno}") // 상품 글 불러들이는 겟매핑
+    public ProductDTO read(@PathVariable("pno") Long pno) {
+        return productService.get(pno);
+    }
+
+    @PutMapping("/{pno}")
+    public Map<String, String> modify(@PathVariable Long pno, ProductDTO productDTO) {
+        // 수정해서 업로드 되는 애들은 아직 저장이 안된애들임
+        productDTO.setPno(pno);
+
+        // 원래 상품(old Product) 정보 가져오기(DB에 저장되어 있는 상품에 대한 정보)
+        ProductDTO oldProductDTO = productService.get(pno);
+
+        // file 업로드
+        List<MultipartFile> files = productDTO.getFiles();
+        List<String> currentUploadFileNames = fileUtil.saveFiles(files);
+
+        // Keep files (이전에 있었는데 이번에 수정할 때도 계속 남아있는 파일) (String)
+        // 이미지 3개중에 한개 지우면 2개는 그대로 있는것이 예시
+        List<String> uploadedFileNames = productDTO.getUploadFileNames();
+        if(currentUploadFileNames != null && !currentUploadFileNames.isEmpty()) {
+            uploadedFileNames.addAll(currentUploadFileNames); // addAll 로 싹 다 넣기
+        }
+
+        productService.modify(productDTO);
+
+        List<String> oldFileNames = oldProductDTO.getUploadFileNames();
+        if(oldFileNames != null && !oldFileNames.isEmpty()) { // 있는지 없는지 먼저 찾아내기
+
+            List<String> removeFiles = // 삭제될 애들을 리스트에 담아서
+            oldFileNames.stream().filter(fileName ->
+                    uploadedFileNames.indexOf(fileName) == -1).collect(Collectors.toList());
+            fileUtil.deleteFiles(removeFiles); // 삭제
+        } // End of if
+
+        return Map.of("RESULT", "MODIFY SUCCESS");
+
+    }
+
+    @DeleteMapping("/{pno}") // 게시글 삭제 매핑
+    // !! 원래는 진짜 삭제 하는건 아닌데 연습삼아 하는것임
+    public Map<String, String> remove(@PathVariable Long pno) {
+        List<String> oldFileNames = productService.get(pno).getUploadFileNames();
+
+        productService.remove(pno);
+
+        fileUtil.deleteFiles(oldFileNames);
+
+        return Map.of("RESULT", "DELETE SUCCESS");
+    }
+
+
 
 
 }
