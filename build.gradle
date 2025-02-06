@@ -31,6 +31,10 @@ dependencies {
     // Spring Boot JPA & Web
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.12.1'
+    testImplementation 'org.springframework.security:spring-security-test'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
@@ -53,6 +57,13 @@ dependencies {
     // Test Dependencies
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // JWT core library
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+
+    // Runtime dependencies for signing and parsing tokens
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'  // For JSON processing with Jackson
 
     implementation 'net.coobird:thumbnailator:0.4.20'
 }

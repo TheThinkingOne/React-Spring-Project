@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.zerock.apiserver.dto.PageRequestDTO;
@@ -54,25 +55,40 @@ public class ProductController {
     }
 
     // 검색해서 나오는 상품들 정보 가져오는 컨트롤러 메소드
+    // 권한 체크해서 없으면 LIST 못들어감
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @GetMapping("/list")
     public PageResponseDTO<ProductDTO> list(PageRequestDTO pageRequestDTO) {
+
+        log.info("list..................." + pageRequestDTO);
+
         return productService.getList(pageRequestDTO);
+
     }
 
     @PostMapping("/")
+    // 프론트의 ProductApi.jsx 파일 참고
     public Map<String, Long> register(ProductDTO productDTO) {
         //List<MultipartFile> files = productDTO.getFiles();
         List<MultipartFile> files = productDTO.getFiles();
 
         List<String> uploadedFileNames = fileUtil.saveFiles(files);
+        // 업로드된 파일을 리스트로 받아 처리
 
         productDTO.setUploadFileNames(uploadedFileNames);
 
         log.info("uploadedFileNames: " + uploadedFileNames);
 
         Long pno = productService.register(productDTO);
+        // 상품을 등록하고, 상품 ID(pno)를 생성
 
-        return Map.of("RESULT", pno);
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        return Map.of("RESULT", pno); // 여기서 JSON 응답 반환
 
     }
 
@@ -126,6 +142,8 @@ public class ProductController {
 
         return Map.of("RESULT", "DELETE SUCCESS");
     }
+
+
 
 
 
