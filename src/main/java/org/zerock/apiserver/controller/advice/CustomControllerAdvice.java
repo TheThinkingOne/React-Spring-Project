@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.zerock.apiserver.util.CustomJWTException;
 
 /**
  * CustomControllerAdvice
@@ -38,5 +39,15 @@ public class CustomControllerAdvice {
         // not acceptable, forbidden,
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(Map.of("msg", msg));
     }
+
+    @ExceptionHandler(CustomJWTException.class)
+    protected ResponseEntity<?> handleJWTException(CustomJWTException e) {
+        // jwt exception 이 발생하면 에러메세지 발생시키기
+
+        String msg = e.getMessage();
+
+        return ResponseEntity.ok().body(Map.of("error", msg));
+    }
+
 }
 
