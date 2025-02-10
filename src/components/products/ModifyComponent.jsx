@@ -240,4 +240,6 @@ function ModifyComponent({ pno }) {
   );
 }
 
+// 로그인 로그아웃 정도가 상태 데이터다
+
 export default ModifyComponent;
