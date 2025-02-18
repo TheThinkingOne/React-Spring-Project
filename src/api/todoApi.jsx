@@ -1,8 +1,7 @@
 // ajax 통신하는 함수 작성
 // api jsx 파일은 API 호출과 관련된 함수 및 경로 설정을 관리하는 역할
 // GET PUT DELETE 같은 CRUD에 필요한 함수 작성
-
-import axios from "axios";
+import jwtAxios from "../util/jwtUtil"; // axios 에서 jwtAxios 로 변경
 
 // 경로 설정
 // api 서버 작업
@@ -19,7 +18,7 @@ const prefix = `${API_SERVER_HOST}/api/todo`; // API 요청의 기본 경로 설
 
 export const getOne = async (tno) => {
   // async = 비동기통신
-  const res = await axios.get(`${prefix}/${tno}`); // tno로 get 요청
+  const res = await jwtAxios.get(`${prefix}/${tno}`); // tno로 get 요청
 
   return res.data;
 };
@@ -27,7 +26,7 @@ export const getOne = async (tno) => {
 export const getList = async (PageParam) => {
   const { page, size } = PageParam;
 
-  const res = await axios.get(`${prefix}/list`, { params: { page, size } });
+  const res = await jwtAxios.get(`${prefix}/list`, { params: { page, size } });
   // PageParam에서 page(페이지 번호)와 size(페이지 크기)를 추출
 
   // async 의 모든 리턴값은 비동기이다.(Promise 객체)
@@ -42,21 +41,21 @@ export const getList = async (PageParam) => {
 
 export const postAdd = async (todoObj) => {
   // JSON.stringify(obj) => 어쩌구 이런거 할필요 없음 axios 사용하면
-  const res = await axios.post(`${prefix}/`, todoObj);
+  const res = await jwtAxios.post(`${prefix}/`, todoObj);
 
   return res.data;
 };
 
 export const deleteOne = async (tno) => {
   // 게시글 삭제
-  const res = await axios.delete(`${prefix}/${tno}`);
+  const res = await jwtAxios.delete(`${prefix}/${tno}`);
 
   return res.data;
 };
 
 export const putOne = async (tno) => {
   // 게시글 수정
-  const res = await axios.put(`${prefix}/${todo.tno}`, todo);
+  const res = await jwtAxios.put(`${prefix}/${todo.tno}`, todo);
 
   return res.data;
 };

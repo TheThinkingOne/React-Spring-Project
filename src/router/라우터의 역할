@@ -1,0 +1,8 @@
+리액트 라우터(React Router)의 역할과 필요성
+
+🌐 1️⃣ SPA(Single Page Application)에서의 경로 관리
+=> 리액트는 기본적으로 SPA(Single Page Application)이기 때문에 페이지가 하나이며,
+페이지 전환시 서버 요청 없이 화면을 갱신함
+하지만 사용자 경험을 개선하고 다양한 화면 구성을 위해 
+URL에 따라 다른 컴포넌트를 렌더링할 필요가 있다.
+

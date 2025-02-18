@@ -1,13 +1,20 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import { logout } from "../../slices/loginSlice";
+import useCustomLogin from "../../hooks/useCustomLogin";
 
 function LogoutComponent(props) {
+  const { doLogout, moveToPath } = useCustomLogin();
+
   const dispatch = useDispatch();
 
   const handleClickLogout = () => {
-    dispatch(logout());
+    doLogout();
+    alert("로그아웃 되었습니다.");
+    moveToPath("/");
   };
+
+  // 리액트는 싱글페이지 어플리케이션 이라서 쿠키를 설정해서 로그인 유지 해야함
 
   return (
     <div className="border-2 border-red-200 mt-10 m-2 p-4">

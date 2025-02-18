@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { login, loginPostAsync } from "../../slices/loginSlice";
 import { loginPost } from "../../api/memberApi";
+import { useNavigate } from "react-router-dom";
+import useCustomLogin from "../../hooks/useCustomLogin";
 
 const initState = {
   email: "",
@@ -11,7 +13,8 @@ const initState = {
 function LoginComponent(props) {
   const [loginParam, setLoginParam] = useState({ ...initState }); // 이메일로그인(oauth)
 
-  const dispatch = useDispatch();
+  const { doLogin, moveToPath } = useCustomLogin();
+
   // useSelector 와 useDispatch 공부하기
   // dispatch의 내용은 다음에 이 어플리케이션에서 이 데이터를 이렇게 유지해 달라는 다음 데이터
 
@@ -24,7 +27,27 @@ function LoginComponent(props) {
   const handleClickLogin = (e) => {
     //dispatch(login(loginParam));
 
-    dispatch(loginPostAsync(loginParam)); // 요즘음 createAsyncthunk 설정한 메소드 바로 사용
+    doLogin(loginParam).then((data) => {
+      if (data.error) {
+        alert("이메일과 패스워드를 확인해주세요!");
+      } else {
+        moveToPath("/");
+      }
+    });
+
+    // 이 아래껀 로그인 로그인 훅스 적용 전
+    // dispatch(loginPostAsync(loginParam))
+    //   .unwrap()
+    //   .then((data) => {
+    //     console.log("after unwrap");
+    //     console.log(data); // 비동기 로그인에 쓰는 unwrap
+    //     if (data.error) {
+    //       alert("이메일과 패스워드를 확인해주세요");
+    //     } else {
+    //       alert("로그인에 성공했습니다");
+    //       navigate({ pathname: "/" }, { replace: true }); // 이렇게 하면 로그인 후에 뒤로가기 막힘
+    //     }
+    //   }); // 요즘음 createAsyncthunk 설정한 메소드 바로 사용
   };
 
   return (
