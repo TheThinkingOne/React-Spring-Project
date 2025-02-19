@@ -87,7 +87,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
             // 상태코드 여기서 지정할 수 있음
             Gson gson = new Gson();
-            String msg = gson.toJson(Map.of("error", "ERROR WITH ACCESS TOKEN ㅠㅅㅠ "));
+            String msg = gson.toJson(Map.of("error", "ERROR WITH ACCESS TOKEN LUL"));
 
             response.setContentType("application/json");
             PrintWriter printWriter = response.getWriter();
