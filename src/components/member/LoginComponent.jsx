@@ -4,6 +4,7 @@ import { login, loginPostAsync } from "../../slices/loginSlice";
 import { loginPost } from "../../api/memberApi";
 import { useNavigate } from "react-router-dom";
 import useCustomLogin from "../../hooks/useCustomLogin";
+import KaKaoLoginComponent from "./KaKaoLoginComponent";
 
 const initState = {
   email: "",
@@ -96,6 +97,9 @@ function LoginComponent(props) {
           </div>
         </div>
       </div>
+
+      {/* 2025/02/19 카카오 로그인 추가 */}
+      <KaKaoLoginComponent />
     </div>
   );
 }
