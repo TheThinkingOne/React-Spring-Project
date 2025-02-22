@@ -2,7 +2,7 @@ import axios from "axios";
 
 const rest_api_key = "a3e22c5eeab24b7f3385e34e2e13b578"; // 카카오개발자에서 받은 Rest API 키
 
-const redirect_uri = "http://localhost:5173/member/kakao"; // 카카오개발자에서 설정한 리다이렉트 URL
+const redirect_uri = "http://localhost:5173/member/kakao"; // 카카오개발자에서 설정한 리다이렉트 URL 이건 문제없는듯함
 
 const auth_code_path = "https://kauth.kakao.com/oauth/authorize"; // 카카오 자체에서 설정한 인가 링크
 
@@ -37,4 +37,12 @@ export const getAccessToken = async (authCode) => {
   const kakaoAccessToken = res.data.access_token;
 
   return kakaoAccessToken;
+};
+
+export const getMemberWithAccessToken = async (accessToken) => {
+  const res = await axios.get(
+    `${API_SERVER_HOST}/api/member/kakao?accessToken=${accessToken}`
+  );
+
+  return res.data;
 };
