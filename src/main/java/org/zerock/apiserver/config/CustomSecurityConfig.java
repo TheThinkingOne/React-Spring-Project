@@ -35,37 +35,47 @@ public class CustomSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         log.info("----------------- Spring Security Config ---------------");
+
+        // CORS 설정
         http.cors(httpSecurityCorsConfigurer -> {
             httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource());
         });
 
-        // 세션 안 만들기
+        // 폼 로그인 비활성화
+        http.formLogin(config -> config.disable());
+
+        // 세션 안 만들기 api 서버는 기본적으로 무상태이기 때문이라고 한다.
         http.sessionManagement(httpSecuritySessionManagementConfigurer -> {
             httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.NEVER);
         });
 
-        // CSRF = 리퀘스트 위조 방지
+        // CSRF 비활성화
         http.csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable());
 
-        // 이 부분은 뭐징
+        // 🔹 인증 예외 처리 추가
+        http.authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("/api/products/view/**").permitAll()  // 이미지 요청은 인증 없이 허용 이거 추가함
+                .anyRequest().authenticated() // 나머지 요청은 인증 필요
+        );
+
+        // 로그인 설정
         http.formLogin(config -> {
             config.loginPage("/api/member/login");
             config.successHandler(new APILoginSuccessHandler());
             config.failureHandler(new APILoginFailHandler());
         });
 
-        // jwt 필터 등록
+        // 🔹 JWT 필터 등록
         http.addFilterBefore(new JWTCheckFilter(), UsernamePasswordAuthenticationFilter.class);
-        // UsernamePassword~ 필터가 동작하기 전에 체크해달라는 메소드
 
-        // 권한여부에 따른 접근허용/거부 관련딘 메소드
+        // 🔹 권한 부족 예외 처리
         http.exceptionHandling(config -> {
             config.accessDeniedHandler(new CustomAccessDeniedHandler());
         });
 
-
         return http.build();
     }
+
 
     // 패스워드 인코더
     @Bean
@@ -78,15 +88,19 @@ public class CustomSecurityConfig {
 
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedOriginPatterns(Arrays.asList("*")); // 모든 도메인 허용
+        configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
-        configuration.setAllowCredentials(true);
+        configuration.setAllowCredentials(true); // 인증된 요청 허용
+
+        // 🔹 브라우저가 이미지 요청을 CORS로 차단하지 않도록 허용
+        configuration.addExposedHeader("Content-Type");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
 
         return source;
     }
+
 
 }

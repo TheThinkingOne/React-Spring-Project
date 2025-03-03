@@ -21,17 +21,17 @@ public class APIRefreshController {
             @RequestHeader("Authorization") String authHeader,
             String refreshToken
     ) {
-
-        if(refreshToken == null) {
-            throw new CustomJWTException("NULL_REFRASH");
-        }
         if(authHeader == null || authHeader.length() < 7) {
             throw new CustomJWTException("INVALID_STRING");
         }
 
+        if(refreshToken == null) {
+            throw new CustomJWTException("NULL_REFRASH");
+        }
+
         // 엑세스 토큰 만료 여부 따져야 함
         String accessToken = authHeader.substring(7); // Bearer ~
-        if(!checkExpiredToken(accessToken)) { // 만료된게 아니라면
+        if(checkExpiredToken(accessToken) == false) { // 만료된게 아니라면
             return Map.of("accessToken", accessToken, "refreshToken", refreshToken);
         }
 

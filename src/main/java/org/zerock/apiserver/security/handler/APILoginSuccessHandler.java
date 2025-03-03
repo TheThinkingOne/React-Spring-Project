@@ -25,7 +25,7 @@ public class APILoginSuccessHandler implements AuthenticationSuccessHandler {
         log.info("-----------------onAuthenticationSuccess");
 
         // JSON 데이터 만들기
-        // 성공했을 때 가정
+        // 성공했을 때 가정(여기로 넘어왔다는 것은 성공했다는 것이기 때문)
         MemberDTO memberDTO = (MemberDTO) authentication.getPrincipal();
 
         Map<String, Object> claims = memberDTO.getClaims(); // 이 claims 는 뭔지도 알아야할듯

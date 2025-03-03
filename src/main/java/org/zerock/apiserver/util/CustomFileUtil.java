@@ -85,23 +85,24 @@ public class CustomFileUtil {
     // 이건 무슨 메소드인가?
     public ResponseEntity<Resource> getFile(String fileName) {
 
-         Resource resource = new FileSystemResource(uploadPath+File.separator+fileName);
+        Resource resource = new FileSystemResource(uploadPath + File.separator + fileName);
 
-         if(!resource.isReadable()) {
-             resource = new FileSystemResource(uploadPath+File.separator+"default.jpeg");
-         }
+        if (!resource.exists() || !resource.isReadable()) {
+            // 🔹 기본 이미지 반환
+            resource = new FileSystemResource(uploadPath + File.separator + "default.jpeg");
+        }
 
-         HttpHeaders headers = new HttpHeaders();
-
+        HttpHeaders headers = new HttpHeaders();
         try {
             headers.add("Content-Type", Files.probeContentType(resource.getFile().toPath()));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to determine file type", e);
         }
 
         return ResponseEntity.ok().headers(headers).body(resource);
-
     }
+
+
 
     // 파일 삭제 관련 메소드
     public void deleteFiles(List<String> fileNames) {

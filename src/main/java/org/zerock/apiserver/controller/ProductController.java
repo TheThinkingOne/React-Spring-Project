@@ -3,6 +3,7 @@ package org.zerock.apiserver.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,8 @@ import org.zerock.apiserver.dto.ProductDTO;
 import org.zerock.apiserver.service.ProductService;
 import org.zerock.apiserver.util.CustomFileUtil;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -49,14 +52,26 @@ public class ProductController {
     // 파일(이미지) 보는 컨트롤러
     @GetMapping("/view/{fileName}")
     public ResponseEntity<Resource> viewFileGet(@PathVariable("fileName") String fileName) {
+        Resource resource = (Resource) fileUtil.getFile(fileName);
 
-        return fileUtil.getFile(fileName);
+        // 🔹 Content-Type이 올바르게 설정되지 않으면 브라우저가 차단할 수 있음
+        HttpHeaders headers = new HttpHeaders();
+        try {
+            headers.add("Content-Type", Files.probeContentType(resource.getFile().toPath()));
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to determine file type", e);
+        }
 
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(resource);
     }
+
+
 
     // 검색해서 나오는 상품들 정보 가져오는 컨트롤러 메소드
     // 권한 체크해서 없으면 LIST 못들어감
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @GetMapping("/list")
     public PageResponseDTO<ProductDTO> list(PageRequestDTO pageRequestDTO) {
 

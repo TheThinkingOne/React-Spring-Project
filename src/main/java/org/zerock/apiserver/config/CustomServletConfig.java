@@ -34,12 +34,12 @@ public class CustomServletConfig implements WebMvcConfigurer {
     // 반대로 변환된 LocalDate를 응답으로 보낼 때 다시 문자열로 변환
 
     // CORS 는 Config 설정 파일에 하는게 낫다
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .maxAge(500)
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS")
-                .allowedOrigins("*");
-    }
+//    @Override
+//    public void addCorsMappings(CorsRegistry registry) {
+//        registry.addMapping("/**")
+//                .maxAge(500)
+//                .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS")
+//                .allowedOrigins("*");
+//    }
 
 }

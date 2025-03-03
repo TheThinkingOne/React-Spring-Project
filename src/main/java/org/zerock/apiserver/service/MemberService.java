@@ -3,6 +3,7 @@ package org.zerock.apiserver.service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zerock.apiserver.domain.Member;
 import org.zerock.apiserver.dto.MemberDTO;
+import org.zerock.apiserver.dto.MemberModifyDTO;
 import org.zerock.apiserver.repository.MemberRepository;
 
 import java.util.stream.Collectors;
@@ -23,5 +24,8 @@ public interface MemberService {
 
         return dto;
     }
+
+    // 회원정보 변경을 위한 DTO 메소드
+    void modifyMember(MemberModifyDTO memberModifyDTO);
 
 }

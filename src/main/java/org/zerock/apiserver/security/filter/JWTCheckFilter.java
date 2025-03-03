@@ -48,22 +48,22 @@ public class JWTCheckFilter extends OncePerRequestFilter {
         log.info("----------------------------");
 
         // jwt 인증헤더
-        String authHeader = request.getHeader("Authorization");
+        String authHeaderStr = request.getHeader("Authorization"); // 이 부분이 비었다고 뜹니다.. 대체 왜?
         // Bearer //7 JWT 문자열로 구성되어 있음
 
         try {
-            String accessToken = authHeader.substring(7); // 앞 7문자를 떼어낸 것이 엑세스 토큰이다
+            String accessToken = authHeaderStr.substring(7); // 앞 7문자를 떼어낸 것이 엑세스 토큰이다
             Map<String , Object> claims = JWTUtil.validateToken(accessToken); // 유효성 검사
 
             log.info("JWT claims: " + claims);
 
             // Security Context Holder 에 사용자 정보 전달
             // 사용자 정보 끄집어내기
-            String email = (String) claims.getOrDefault("email", "");
-            String pw = (String) claims.getOrDefault("pw", "");
-            String nickname = (String) claims.getOrDefault("nickname", "");
-            Boolean social = claims.get("social") != null ? (Boolean) claims.get("social") : false;
-            List<String> roleNames = claims.get("roleNames") != null ? (List<String>) claims.get("roleNames") : List.of();
+            String email = (String) claims.get("email");
+            String pw = (String) claims.get("pw");
+            String nickname = (String) claims.get("nickname");
+            Boolean social = (Boolean) claims.get("social");
+            List<String> roleNames = (List<String>) claims.get("roleNames");
 
             // MemberDTO 생성
             MemberDTO memberDTO = new MemberDTO(email, pw, nickname, social.booleanValue(), roleNames);
@@ -79,7 +79,8 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             // 무상태라서 매번 호출해서 인증한다는 리소스 적인 단점이 있다.
 
-            filterChain.doFilter(request, response); // 필터 등록 필요
+            // 다음 목적지로 가게 하는 거
+            filterChain.doFilter(request, response); // 필터 등록 필요 여기서 Product 들어가면 AccessDeniedException 발생
         }
         catch (Exception e) {
             log.error("JWT CHECK ERROR ㅠㅅㅠ----------");
@@ -88,6 +89,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             // 상태코드 여기서 지정할 수 있음
             Gson gson = new Gson();
             String msg = gson.toJson(Map.of("error", "ERROR WITH ACCESS TOKEN LUL"));
+            // 이 부분이 에러 메세지 적은것과 리액트에 적은게 똑같아야 함
 
             response.setContentType("application/json");
             PrintWriter printWriter = response.getWriter();

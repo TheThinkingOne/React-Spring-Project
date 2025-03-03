@@ -3,7 +3,7 @@ package org.zerock.apiserver.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpHeaders; // 이건 맞음
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,6 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.zerock.apiserver.domain.Member;
 import org.zerock.apiserver.domain.MemberRole;
 import org.zerock.apiserver.dto.MemberDTO;
+import org.zerock.apiserver.dto.MemberModifyDTO;
 import org.zerock.apiserver.repository.MemberRepository;
 
 import java.util.LinkedHashMap;
@@ -34,21 +35,30 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public MemberDTO getKakaoMember(String accessToken) {
-        log.info("getKakaoMember() 실행...");
+        log.info("[DEBUG] getKakaoMember() 실행됨, accessToken: " + accessToken);
+
+        if (accessToken == null || accessToken.isEmpty()) {
+            log.error("[ERROR] accessToken이 null 또는 비어 있음");
+            return null;
+        }
 
         // accessToken 을 이용해서 사용자 정보 가져오기
 
         // 카카오 연동 닉네임 -- 이메일 주소에 해당(예전에는 카카오 로그인하면 이메일 가져오는게 됬지만 지금은 안되니까...)
         String nickname = getEmailFromKakaoAccessToken(accessToken); // 카카오에서 이메일 가져오기
         log.info("가져온 닉네임: " + nickname);
+        if (nickname == null) {
+            log.error("[ERROR] getEmailFromKakaoAccessToken 에서 닉네임을 가져오지 못함");
+            return null;
+        }
 
         // 기존 DB에 이미 있는 경우는? 없는 경우는? => 따로 처리해야함
         // 닉네임으로 아이디 찾아보기
         Optional<Member> result = memberRepository.findById(nickname);
+
         if(result.isPresent()) {
 
             MemberDTO memberDTO = entityToDTO(result.get());
-
             log.info("is already existed.............." + memberDTO);
 
             return memberDTO;
@@ -61,13 +71,30 @@ public class MemberServiceImpl implements MemberService {
             // 소셜 로그인 해도 화면에 로그인 관련 정보 안 나오고 DB에 사용자 정보가 저장되고 있지 않음
         }
 
+        // 이미 회원이 아닌경우(신규 가입자인 경우)
         Member socialMember = makeSocialMember(nickname);
 
         memberRepository.save(socialMember); // 소셜 유저 저장
 
         MemberDTO memberDTO = entityToDTO(socialMember); // 소셜 유저 정보를 DTO 에 담기
+        log.info("[DEBUG] 신규 회원 저장됨: " + socialMember);
 
         return memberDTO;
+    }
+
+    // 회원정보 변경을 위한 서비스 IMPL 메소드
+    @Override
+    public void modifyMember(MemberModifyDTO memberModifyDTO) {
+        Optional<Member> result = memberRepository.findById(memberModifyDTO.getEmail());
+
+        Member member = result.orElseThrow();
+
+        // 이 페이지에서 정보를 수정했다는 것은 더이상 소셜 회원이 아니라는 것?
+        member.changeNickname(memberModifyDTO.getNickname());
+        member.changeSocial(false);
+        member.changePw(passwordEncoder.encode(memberModifyDTO.getPw()));
+
+        memberRepository.save(member);
     }
 
     private Member makeSocialMember(String email) {
@@ -77,7 +104,7 @@ public class MemberServiceImpl implements MemberService {
         log.info("임시 비번 tempPassword: " + tempPassword);
 
         Member member = Member.builder()
-                .email(email)
+                .email(email) // 이메일을 닉네임으로 대신할것
                 .pw(passwordEncoder.encode(tempPassword))
                 .nickname("Social Login Member")
                 .social(true)
@@ -92,7 +119,8 @@ public class MemberServiceImpl implements MemberService {
     // 사용쟈 정보 가져오는건 restTemplate 로 처리
     private String getEmailFromKakaoAccessToken(String accessToken) {
 
-        String kakaoGetUserURl = "https://kapi.kakao.com/v2/users/me";
+        log.info("[DEBUG] getEmailFromKakaoAccessToken 실행됨, accessToken: " + accessToken);
+        String kakaoGetUserURL = "https://kapi.kakao.com/v2/user/me";
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -103,29 +131,56 @@ public class MemberServiceImpl implements MemberService {
 
         HttpEntity<String> entity = new HttpEntity<>(headers); // 정보 담는 엔티티
 
-        UriComponents uriBuilder = UriComponentsBuilder.fromHttpUrl(kakaoGetUserURl).build();
+        // 위까진 동일
 
-        ResponseEntity<LinkedHashMap> response = // 카카오에서 받아오는 정보는 LinkedHashMap 이다.
-                restTemplate.exchange(uriBuilder.toString(), HttpMethod.GET, entity, LinkedHashMap.class);
+        UriComponents uriComponents = UriComponentsBuilder.fromHttpUrl(kakaoGetUserURL).build();
 
-        log.info("카카오 응답: " + response);
+//        ResponseEntity<LinkedHashMap> response = // 카카오에서 받아오는 정보는 LinkedHashMap 이다.
+//                restTemplate.exchange(uriComponents.toString(), HttpMethod.GET, entity, LinkedHashMap.class);
+//
+//        log.info("카카오 응답: " + response);
+//
+//        // 윗줄의 response 를 LinkedHashMap 으로 끄집어내서 bodyMap 에 담기
+//        LinkedHashMap<String, LinkedHashMap> bodyMap = response.getBody();
+//
+//        // 여기는 교재랑 다른부분
+//        LinkedHashMap<String, String> kakaoAccount = bodyMap.get("properties"); // 이전에는 kakao_account 대신 properties 가 적혀있었음
+//
+//        log.info("--------------check for Kakao LinkedHashMap------------");
+//        log.info(bodyMap);
+//        log.info("kakaoAccount = " + kakaoAccount);
+//
+//        String nickname = kakaoAccount.get("nickname"); // 카카오 닉네임
+//
+//        log.info("카카오 닉네임 = " + nickname);
+//
+//        return nickname;
+        try {
+            ResponseEntity<LinkedHashMap> response = restTemplate.exchange(
+                    uriComponents.toString(),
+                    HttpMethod.GET,
+                    entity,
+                    LinkedHashMap.class
+            );
 
-        // 윗줄의 response 를 LinkedHashMap 으로 끄집어내서 bodyMap 에 담기
-        LinkedHashMap<String, LinkedHashMap> bodyMap = response.getBody();
+            log.info("[DEBUG] 카카오 API 응답: " + response.getBody());
 
-        // 여기는 교재랑 다른부분
-        LinkedHashMap<String, String> kakaoAccount = bodyMap.get("properties");
+            LinkedHashMap<String, Object> bodyMap = response.getBody();
+            LinkedHashMap<String, String> kakaoAccount = (LinkedHashMap<String, String>) bodyMap.get("properties");
 
-        log.info("--------------check for Kakao LinkedHashMap------------");
-        log.info(bodyMap);
-        log.info("kakaoAccount = " + kakaoAccount);
+            if (kakaoAccount == null) {
+                log.error("[ERROR] 카카오 API 응답에서 properties 키를 찾을 수 없음");
+                return null;
+            }
 
-        String nickName = kakaoAccount.get("nickname");
+            String nickName = kakaoAccount.get("nickname");
+            log.info("[DEBUG] 카카오에서 가져온 닉네임: " + nickName);
 
-        log.info("카카오 닉네임 = " + nickName);
-
-        return nickName;
-
+            return nickName;
+        } catch (Exception e) {
+            log.error("[ERROR] 카카오 API 요청 실패:", e);
+            return null;
+        }
     }
 
     // 10자리의 랜덤한 비밀번호 만드는 메소드
