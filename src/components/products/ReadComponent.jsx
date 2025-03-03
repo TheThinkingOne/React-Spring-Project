@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { API_SERVER_HOST, getOne } from "../../api/todoApi";
+import { API_SERVER_HOST } from "../../api/todoApi";
 import FetchingModal from "../common/FetchingModal";
-import useCustomMove from "../../hooks/useCustomMove";
+import useCustomMove from "../../hooks/useCustomMove.jsx";
+import { getOne } from "../../api/productsApi.jsx"; // 여기에 getOne 이라는 함수를 수정 전에 todoApi 에서 불러오고 있었음 아마 잘못 적은듯
 
 const initState = {
+  // 여긴 문제 없음
   pno: 0,
   pname: "",
   pdesc: "",
-  price: "",
+  price: 0, // 여기 원래 "" 로 되어 있었떤데 오타인가
   uploadFileNames: [],
 };
 
 const host = API_SERVER_HOST;
 
 function ReadComponent({ pno }) {
+  // pno를 파라미터로
   const [product, setProduct] = useState(initState);
   const [fetching, setFetching] = useState(false);
 
@@ -88,7 +91,7 @@ function ReadComponent({ pno }) {
         <button
           type="button"
           className="inline-block rounded p-4 m-2 text-xl w-32 text-white bg-red-500"
-          onClick={() => moveToModify(product.pno)}
+          onClick={() => moveToModify(pno)}
         >
           Modify
         </button>

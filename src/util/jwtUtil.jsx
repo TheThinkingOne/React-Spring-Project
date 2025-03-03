@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getCookie, setCookie } from "./cookieUtil";
+import { getCookie, setCookie } from "./cookieUtil.jsx";
 import { API_SERVER_HOST } from "../api/todoApi";
 import { Await } from "react-router-dom";
 
@@ -10,6 +10,7 @@ const refreshJWT = async (accessToken, refreshToken) => {
   const host = API_SERVER_HOST;
 
   const header = { headers: { Authorization: `Bearer ${accessToken}` } };
+  // const header = { headers: { Authorization: `Bearer ${accessToken}` } }; // 여기 강의 보고 수정하기 전에
 
   const res = await axios.get(
     `${host}/api/member/refresh?refreshToken=${refreshToken}`,
@@ -30,6 +31,8 @@ const beforeReq = (config) => {
 
   const memberInfo = getCookie("member");
 
+  console.log("memberInfo from cookie:", memberInfo); // 🔍 쿠키에서 토큰이 정상적으로 있는지 확인
+
   if (!memberInfo) {
     // 로그인 되어있는 상태가 아니라면
     console.log("Member not Found");
@@ -37,6 +40,7 @@ const beforeReq = (config) => {
   }
 
   const { accessToken } = memberInfo;
+  console.log("JWTCheckUtil.jsx 에서 확인한 토큰 :", accessToken); // 🔍 실제로 저장된 JWT 토큰 확인
 
   console.log(
     "-------------------------------------------------" + accessToken

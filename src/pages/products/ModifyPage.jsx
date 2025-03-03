@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import ModifyComponent from "../../components/products/ModifyComponent";
+import ModifyComponent from "../../components/products/ModifyComponent"; // 이거 맞음
 
 function ModifyPage(props) {
   const { pno } = useParams();

@@ -16,6 +16,10 @@ function LoginComponent(props) {
 
   const { doLogin, moveToPath } = useCustomLogin();
 
+  // const dispatch = useDispatch();
+
+  // const navigate = useNavigate();
+
   // useSelector 와 useDispatch 공부하기
   // dispatch의 내용은 다음에 이 어플리케이션에서 이 데이터를 이렇게 유지해 달라는 다음 데이터
 

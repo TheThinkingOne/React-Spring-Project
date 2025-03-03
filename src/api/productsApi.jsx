@@ -1,3 +1,4 @@
+import axios from "axios";
 import jwtAxios from "../util/jwtUtil"; // axios 에서 jwtAxios 로 변경
 import { API_SERVER_HOST } from "./todoApi";
 
@@ -24,8 +25,24 @@ export const getList = async (pageParam) => {
   return res.data;
 };
 
-export const getOne = async (pno) => {
-  const res = await jwtAxios.get(`${host}/${pno}`);
+export const getOne = async (tno) => {
+  // 강의는 여기가 pno가 아니고 tno로 되어있다???
+  // 여긴 문제 없음
+  const res = await jwtAxios.get(`${host}/${tno}`);
+
+  return res.data;
+};
+
+export const deleteOne = async (pno) => {
+  const res = await jwtAxios.delete(`${host}/${pno}`);
+
+  return res.data;
+};
+
+export const putOne = async (pno, product) => {
+  const header = { headers: { "Content-Type": "multipart/form-data" } };
+
+  const res = await jwtAxios.put(`${host}/${pno}`, product, header);
 
   return res.data;
 };

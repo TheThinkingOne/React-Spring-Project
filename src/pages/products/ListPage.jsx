@@ -1,5 +1,5 @@
 import React from "react";
-import ListComponent from "../../components/products/ListComponent";
+import ListComponent from "../../components/products/ListComponent.jsx";
 
 function ListPage(props) {
   return (

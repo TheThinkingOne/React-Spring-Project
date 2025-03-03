@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import useCustomMove from "../../hooks/useCustomMove";
-import { API_SERVER_HOST, getList } from "../../api/todoApi";
+import { API_SERVER_HOST } from "../../api/todoApi";
+import { getList } from "../../api/productsApi";
 import FetchingModal from "../common/FetchingModal";
 import PageComponent from "../common/PageComponent";
 
@@ -23,15 +24,14 @@ function ListComponent(props) {
   const { moveToList, moveToRead, page, size, refresh } = useCustomMove();
 
   const [serverData, setServerData] = useState(initState);
-
   const [fetching, setFetching] = useState(false);
 
   useEffect(() => {
-    // 이부분 다시 공부해야겠어 useEffect 에 대해 알아보기
     setFetching(true);
 
     getList({ page, size }).then((data) => {
-      setFetching(true);
+      console.log("[DEBUG] 서버에서 받은 데이터:", data);
+      setFetching(false);
       setServerData(data);
     });
   }, [page, size, refresh]);
@@ -39,7 +39,7 @@ function ListComponent(props) {
   return (
     <div className="border-2 border-blue-100 mt-10 mr-2 ml-2">
       {/* 로딩 중일 때 FetchingModal 표시 */}
-      {fetching ? <FetchingModal /> : null}
+      {fetching ? <FetchingModal /> : <></>}
 
       <div className="flex flex-wrap mx-auto p-6">
         {serverData.dtoList.map((product) => (
@@ -56,11 +56,11 @@ function ListComponent(props) {
 
               {/* 이미지 영역 */}
               <div className="text-1xl m-1 p-2 w-full flex flex-col">
-                <div className="w-full overflow-hidden flex justify-center">
+                <div className="w-full overflow-hidden flex flex-col items-center">
                   <img
                     alt="product"
                     className="rounded-md w-60"
-                    src={`${host}/api/products/view/s_${product.uploadFileNames[0]}`} // 섬네일보여주는부분
+                    src={`${host}/api/products/view/s_${product.uploadFileNames[0]}`}
                   />
                 </div>
 
@@ -74,10 +74,7 @@ function ListComponent(props) {
           </div>
         ))}
       </div>
-      <PageComponent
-        serverData={serverData}
-        movePage={moveToList}
-      ></PageComponent>
+      <PageComponent serverData={serverData} movePage={moveToList} />
     </div>
   );
 }

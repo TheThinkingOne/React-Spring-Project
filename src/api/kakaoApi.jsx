@@ -1,4 +1,5 @@
 import axios from "axios";
+import { API_SERVER_HOST } from "./todoApi";
 
 const rest_api_key = "a3e22c5eeab24b7f3385e34e2e13b578"; // 카카오개발자에서 받은 Rest API 키
 
@@ -8,6 +9,8 @@ const auth_code_path = "https://kauth.kakao.com/oauth/authorize"; // 카카오 �
 
 const access_token_uri = "https://kauth.kakao.com/oauth/token"; // 카카오 엑세스 토큰 링크
 
+const secret_key = "YChReJ7bS7y7qDgz1PPT3rYwSzV0ieI9";
+
 export const getKakaoLoginLink = () => {
   const kakaoURL = `${auth_code_path}?client_id=${rest_api_key}&redirect_uri=${redirect_uri}&response_type=code`;
 
@@ -16,6 +19,7 @@ export const getKakaoLoginLink = () => {
 
 export const getAccessToken = async (authCode) => {
   // Ajax로 비동기 통신
+  console.log("[DEBUG용도] getAccessToken 호출됨, authCode:", authCode);
 
   // 1. 헤더 지정
   const header = {
@@ -32,17 +36,37 @@ export const getAccessToken = async (authCode) => {
     code: authCode,
   };
 
-  const res = await axios.post(access_token_uri, params, header);
+  // const res = await axios.post(access_token_uri, params, header);
 
-  const kakaoAccessToken = res.data.access_token;
+  // const accessToken = res.data.access_token; // 원래 내가 변수명을 kakaoAccessToken 으로 해놨었는데 강의랑 똑같이 accessToken 으로 변경해봄
 
-  return kakaoAccessToken;
+  // return accessToken;
+  try {
+    const res = await axios.post(access_token_uri, params, header);
+    const accessToken = res.data.access_token;
+    console.log("[DEBUG] 카카오에서 받은 accessToken:", accessToken);
+    return accessToken;
+  } catch (error) {
+    console.error("[ERROR] 카카오 accessToken 요청 실패:", error);
+  }
 };
 
 export const getMemberWithAccessToken = async (accessToken) => {
-  const res = await axios.get(
-    `${API_SERVER_HOST}/api/member/kakao?accessToken=${accessToken}`
-  );
+  // API 서버 호출
+  // const res = await axios.get(
+  //   `${API_SERVER_HOST}/api/member/kakao?accessToken=${accessToken}`
+  // );
 
-  return res.data;
+  // console.log(res);
+
+  // return res.data;
+  try {
+    const res = await axios.get(
+      `${API_SERVER_HOST}/api/member/kakao?accessToken=${accessToken}`
+    );
+    console.log("[DEBUG] 백엔드에서 받은 응답:", res.data);
+    return res.data;
+  } catch (error) {
+    console.error("[ERROR] 백엔드 요청 실패:", error);
+  }
 };

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { API_SERVER_HOST, deleteOne, getOne, putOne } from "../../api/todoApi";
+import { API_SERVER_HOST } from "../../api/todoApi";
 import FetchingModal from "../common/FetchingModal";
 import useCustomMove from "../../hooks/useCustomMove";
 import ResultModal from "../common/ResultModal";
+import { getOne } from "../../api/productsApi";
 
 const initState = {
   pno: 0,
@@ -36,6 +37,7 @@ function ModifyComponent({ pno }) {
   }, [pno]);
 
   const handleChangeProduct = (e) => {
+    // 이건 ok
     // 입력값 변경하는놈
     product[e.target.name] = e.target.value;
     setProduct({ ...product });
@@ -72,6 +74,8 @@ function ModifyComponent({ pno }) {
       formData.append("uploadFileNames", product.uploadFileNames[i]);
     }
 
+    setFetching(true);
+
     // 이 부분이 아마 수정창에서 이미지 넣었을 때 새로 나타나게 하는 부분인듯
     putOne(pno, formData).then((data) => {
       setResult("Modified");
@@ -99,7 +103,7 @@ function ModifyComponent({ pno }) {
   return (
     <div className="border-2 border-sky-200 mt-10 m-2 p-4">
       {/* 로딩 중일 때 FetchingModal 표시 */}
-      {fetching ? <FetchingModal /> : null}
+      {fetching ? <FetchingModal /> : <></>}
 
       {result ? (
         <ResultModal

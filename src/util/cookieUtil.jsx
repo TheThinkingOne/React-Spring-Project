@@ -20,3 +20,5 @@ export const getCookie = (name) => {
 export const removeCookie = (name, path = "/") => {
   cookies.remove(name, { path: path });
 };
+
+// 여긴 문제 없음음

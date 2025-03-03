@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { postAdd } from "../../api/productApi";
+import { postAdd } from "../../api/productsApi";
 import FetchingModal from "../common/FetchingModal";
 import ResultModal from "../common/ResultModal";
 import useCustomMove from "../../hooks/useCustomMove";
@@ -22,7 +22,7 @@ function AddComponent(props) {
 
   const uploadRef = useRef();
 
-  const [fetching, setFetching] = useState(false); // 이건 뭐징
+  const [fetching, setFetching] = useState(false); // 패칭모달(로딩중) 보여지게 하는거
 
   const [result, setResult] = useState(false); // 결과끝나면 모달창 보여지게 하기
 
@@ -63,7 +63,7 @@ function AddComponent(props) {
     postAdd(formData).then((data) => {
       setFetching(false);
       console.log("postAdd 서버응답값 : ", data);
-      setResult(data.RESULT);
+      setResult(data.result); // 여기 data.RESULT 였는데 뭐가 맞는걸까
     });
   };
 

@@ -16,10 +16,25 @@ const useCustomLogin = () => {
 
   const isLogin = loginState.email ? true : false; // 로그인 여부 확인
 
+  // const doLogin = async (loginParam) => {
+  //   try {
+  //     const action = await dispatch(loginPostAsync(loginParam)).unwrap(); // unwrap() 사용
+  //     return action; // action.payload 대신 바로 action 반환 가능
+  //   } catch (error) {
+  //     console.error("Login failed:", error);
+  //     throw error;
+  //   }
+  // };
+
   const doLogin = async (loginParam) => {
-    //----------로그인 수행 함수
-    const action = await dispatch(loginPostAsync(loginParam));
-    return action.payload;
+    // 로그인 수행 함수
+    try {
+      const action = await dispatch(loginPostAsync(loginParam)).unwrap(); // unwrap() 사용
+      return action; // action.payload 대신 바로 action 반환 가능
+    } catch (error) {
+      console.error("Login failed:", error);
+      throw error;
+    }
   };
 
   // 로그아웃 수행 함수

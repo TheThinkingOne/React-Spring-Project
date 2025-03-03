@@ -30,7 +30,11 @@ const loginSlice = createSlice({
       // state : 기존의 상태, action : 파라미터
       console.log("login.....", action);
       console.log(action.payload);
-      return { email: action.payload.email }; // 리턴값이 바로 새로운 상태
+
+      setCookie("member", JSON.stringify(action.payload), 1);
+
+      return { email: action.payload.email }; // 이게 맞는건가
+      // return action.payload; // 리턴값이 바로 새로운 상태
       // 이메일을 action.payload.email로 설정
 
       // action.payload 가 사용자가 입력하는 실제 이메일 값 => email을 action.payload 의 값으로 사용하겠다 선언
@@ -67,5 +71,6 @@ const loginSlice = createSlice({
   },
   //
 });
+//
 export const { login, logout } = loginSlice.actions;
 export default loginSlice.reducer;

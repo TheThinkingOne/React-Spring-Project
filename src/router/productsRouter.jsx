@@ -48,7 +48,7 @@ const productRouters = () => {
       path: "modify/:pno",
       element: (
         <Suspense fallback={Loading}>
-          <ModifyPage />
+          <ProductModify />
         </Suspense>
       ),
     },
