@@ -52,21 +52,8 @@ export const getAccessToken = async (authCode) => {
 };
 
 export const getMemberWithAccessToken = async (accessToken) => {
-  // API 서버 호출
-  // const res = await axios.get(
-  //   `${API_SERVER_HOST}/api/member/kakao?accessToken=${accessToken}`
-  // );
-
-  // console.log(res);
-
-  // return res.data;
-  try {
-    const res = await axios.get(
-      `${API_SERVER_HOST}/api/member/kakao?accessToken=${accessToken}`
-    );
-    console.log("[DEBUG] 백엔드에서 받은 응답:", res.data);
-    return res.data;
-  } catch (error) {
-    console.error("[ERROR] 백엔드 요청 실패:", error);
-  }
+  const res = await axios.get(
+    `${API_SERVER_HOST}/api/member/kakao?accessToken=${accessToken}`
+  );
+  return res.data;
 };

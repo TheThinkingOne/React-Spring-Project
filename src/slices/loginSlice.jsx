@@ -31,9 +31,11 @@ const loginSlice = createSlice({
       console.log("login.....", action);
       console.log(action.payload);
 
+      const payload = action.payload;
+
       setCookie("member", JSON.stringify(action.payload), 1);
 
-      return { email: action.payload.email }; // 이게 맞는건가
+      return payload; // 이게 맞는건가
       // return action.payload; // 리턴값이 바로 새로운 상태
       // 이메일을 action.payload.email로 설정
 
