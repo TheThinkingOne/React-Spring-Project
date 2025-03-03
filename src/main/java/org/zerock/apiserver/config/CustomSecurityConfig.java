@@ -70,7 +70,7 @@ public class CustomSecurityConfig {
 
         // 🔹 권한 부족 예외 처리
         http.exceptionHandling(config -> {
-            config.accessDeniedHandler(new CustomAccessDeniedHandler());
+            config.accessDeniedHandler(new CustomAccessDeniedHandler()); // 403 발생시 핸들링?
         });
 
         return http.build();

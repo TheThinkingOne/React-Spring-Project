@@ -71,7 +71,7 @@ public class ProductController {
 
     // 검색해서 나오는 상품들 정보 가져오는 컨트롤러 메소드
     // 권한 체크해서 없으면 LIST 못들어감
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @GetMapping("/list")
     public PageResponseDTO<ProductDTO> list(PageRequestDTO pageRequestDTO) {
 
