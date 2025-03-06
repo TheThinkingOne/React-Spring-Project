@@ -91,6 +91,7 @@ public class CustomSecurityConfig {
         configuration.setAllowedOriginPatterns(Arrays.asList("*")); // 모든 도메인 허용
         configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization")); // <- 추가
         configuration.setAllowCredentials(true); // 인증된 요청 허용
 
         // 🔹 브라우저가 이미지 요청을 CORS로 차단하지 않도록 허용

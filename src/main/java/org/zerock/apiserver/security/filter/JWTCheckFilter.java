@@ -35,10 +35,17 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             return true;
         }
 
-        if (path.startsWith("/api/member/")) {
+        if (path.startsWith("/api/member/*")) {
             // 회원쪽 로그인 할때는 jwt 체크 하지 않겠다(테스트용)
             return true;
         }
+
+        // ✅ 로그인 요청은 필터 제외
+        if (path.equals("/api/member/login") || path.startsWith("/api/member/refresh")) {
+            return true;
+        }
+
+
 
         return false; // shouldNOtFilter 에서 false 리턴이면 체크한다는 뜻
     }
@@ -54,7 +61,14 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
         // jwt 인증헤더
         String authHeaderStr = request.getHeader("Authorization"); // 이 부분이 비었다고 뜹니다.. 대체 왜?
+        log.info("Authorization 헤더 값: " +  authHeaderStr);
         // Bearer //7 JWT 문자열로 구성되어 있음
+
+        if (authHeaderStr == null || !authHeaderStr.startsWith("Bearer ")) {
+            log.info("Authorization 헤더가 없음 또는 잘못된 값입니다.");
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         try {
             String accessToken = authHeaderStr.substring(7); // 앞 7문자를 떼어낸 것이 엑세스 토큰이다
@@ -90,6 +104,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
         catch (Exception e) {
             log.error("JWT CHECK ERROR ㅠㅅㅠ----------");
             log.error(e.getMessage());
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "토큰이 유효하지 않음");
 
             // 상태코드 여기서 지정할 수 있음
             Gson gson = new Gson();
