@@ -4,6 +4,7 @@ import { API_SERVER_HOST } from "../../api/todoApi";
 import { getList } from "../../api/productsApi";
 import FetchingModal from "../common/FetchingModal";
 import PageComponent from "../common/PageComponent";
+import { getCookie } from "../../util/cookieUtil"; // 쿠키에서 토큰 가져오기
 
 const initState = {
   dtoList: [],
@@ -25,6 +26,8 @@ function ListComponent(props) {
 
   const [serverData, setServerData] = useState(initState);
   const [fetching, setFetching] = useState(false);
+
+  const token = getCookie("member")?.accessToken;
 
   useEffect(() => {
     setFetching(true);
@@ -61,6 +64,9 @@ function ListComponent(props) {
                     alt="product"
                     className="rounded-md w-60"
                     src={`${host}/api/products/view/s_${product.uploadFileNames[0]}`}
+                    style={{
+                      headers: { Authorization: `Bearer ${token}` }, // ✅ Authorization 헤더 추가
+                    }}
                   />
                 </div>
 

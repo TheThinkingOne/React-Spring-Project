@@ -3,7 +3,7 @@ import { API_SERVER_HOST } from "../../api/todoApi";
 import FetchingModal from "../common/FetchingModal";
 import useCustomMove from "../../hooks/useCustomMove";
 import ResultModal from "../common/ResultModal";
-import { getOne } from "../../api/productsApi";
+import { getOne, deleteOne, putOne } from "../../api/productsApi";
 
 const initState = {
   pno: 0,

@@ -1,6 +1,7 @@
 import axios from "axios";
 import jwtAxios from "../util/jwtUtil"; // axios 에서 jwtAxios 로 변경
 import { API_SERVER_HOST } from "./todoApi";
+import { getCookie } from "../util/cookieUtil";
 
 const host = `${API_SERVER_HOST}/api/products`;
 
@@ -17,6 +18,13 @@ export const postAdd = async (product) => {
 // 스프링의 ProductController 참고, 이와 연동함
 export const getList = async (pageParam) => {
   const { page, size } = pageParam; // 구조분해 할당?
+
+  const token = getCookie("member")?.accessToken;
+
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  };
 
   const res = await jwtAxios.get(`${host}/list`, {
     params: { page: page, size: size },
