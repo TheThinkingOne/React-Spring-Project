@@ -26,18 +26,17 @@ public class CartItem {
     // CartItem 엔티티에서 Product 엔티티와 다대일(@ManyToOne) 관계를 설정
     // 외래키(FK)로 product_pno 컬럼 사용 선언
     @ManyToOne
-    @JoinColumn(name = "product_pno")
+    @JoinColumn(name = "product_pno") // Foreign Key (Product 테이블과)
     private Product product;
 
     @ManyToOne
-    @JoinColumn(name = "cart_cno")
+    @JoinColumn(name = "cart_cno") // Foreign Key (Cart 테이블과)
     private Cart cart;
 
     private int qty; // 수량
 
-    private void changeQty(int qty) {
+    public void changeQty(int qty) {
         this.qty = qty;
     }
-
 
 }

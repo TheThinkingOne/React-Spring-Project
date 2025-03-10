@@ -21,7 +21,7 @@ public class Cart {
     private Long cno;
 
     @OneToOne // 장바구니와 사용자 매칭 (1대1)
-    @JoinColumn(name = "member_owner")
+    @JoinColumn(name = "member_owner") // Foreign Key
     private Member owner;
 
 

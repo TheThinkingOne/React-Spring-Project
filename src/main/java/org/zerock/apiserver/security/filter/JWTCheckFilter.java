@@ -30,22 +30,20 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
         log.info("check url--------" + path);
 
-        //이미지 조회 경로는 체크하지 않는다면
-        if(path.startsWith("/api/products/view/")) {
-            return true;
-        }
-
-        if (path.startsWith("/api/member/*")) {
+        if (path.startsWith("/api/member/")) {
             // 회원쪽 로그인 할때는 jwt 체크 하지 않겠다(테스트용)
             return true;
         }
 
-        // ✅ 로그인 요청은 필터 제외
-        if (path.equals("/api/member/login") || path.startsWith("/api/member/refresh")) {
+        //이미지 조회 경로는 체크하지 않는다면
+        if (path.startsWith("/api/products/view/")) {
             return true;
         }
 
-
+//        // ✅ 로그인 요청은 필터 제외
+//        if (path.equals("/api/member/login") || path.startsWith("/api/member/refresh")) {
+//            return true;
+//        }
 
         return false; // shouldNOtFilter 에서 false 리턴이면 체크한다는 뜻
     }

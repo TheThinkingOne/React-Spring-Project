@@ -11,7 +11,7 @@ public class CartItemListDTO {
 
     private Long cino; // 상품번호
 
-    private int id;
+    private int qty;
 
     private String pname;
 
@@ -21,9 +21,9 @@ public class CartItemListDTO {
 
     // 생성자 추가
 
-    public CartItemListDTO(Long cino, int id, String pname, int price, String imageFile) {
+    public CartItemListDTO(Long cino, int qty, String pname, int price, String imageFile) {
         this.cino = cino;
-        this.id = id;
+        this.qty = qty;
         this.pname = pname;
         this.price = price;
         this.imageFile = imageFile;
