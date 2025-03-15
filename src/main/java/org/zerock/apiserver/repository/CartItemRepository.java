@@ -14,7 +14,7 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
     // 입력값 : input = email, 가져오는값 : output = CartItemListDTO
     @Query("SELECT" +
-            " new org.zerock.apiserver.dto.CartItemListDTO(ci.cino, ci.qty, p.pname, p.price, pi.fileName) " +
+            " new org.zerock.apiserver.dto.CartItemListDTO(ci.cino, ci.qty, p.pname, p.price, p.pno, pi.fileName) " +
             " FROM CartItem ci " +
             " INNER JOIN Cart mc ON ci.cart = mc " +
             " LEFT JOIN Product p on ci.product = p" +

@@ -2,6 +2,7 @@ package org.zerock.apiserver.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.internal.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -71,11 +72,17 @@ public class ProductController {
 
     // 검색해서 나오는 상품들 정보 가져오는 컨트롤러 메소드
     // 권한 체크해서 없으면 LIST 못들어감
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER')")
+    @PreAuthorize("hasAnyRole('ROLE_USER')")
     @GetMapping("/list")
     public PageResponseDTO<ProductDTO> list(PageRequestDTO pageRequestDTO) {
 
         log.info("list..................." + pageRequestDTO);
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         return productService.getList(pageRequestDTO);
 
@@ -108,7 +115,15 @@ public class ProductController {
     }
 
     @GetMapping("/{pno}") // 상품 글 불러들이는 겟매핑
-    public ProductDTO read(@PathVariable("pno") Long pno) {
+    public ProductDTO read(@PathVariable(name="pno") Long pno) { // 여기 이전에 name="pno" 말고 그냥 "pno"로 되어있었음
+
+        // 상태 변화를 확인하기 위한 스레드 설정(1.5초 간격)
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
         return productService.get(pno);
     }
 
