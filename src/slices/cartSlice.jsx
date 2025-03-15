@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getCartItems } from "../api/CartApi";
+import { getCartItems, postChangeCart } from "../api/CartApi";
 
 // createAsyncThunk 로 감싼 이유 : extra reducer 로 동작시키기 위함
 export const getCartItemsAsync = createAsyncThunk("getCartItemsAsync", () => {
@@ -9,7 +9,7 @@ export const getCartItemsAsync = createAsyncThunk("getCartItemsAsync", () => {
 export const postChangeCartAsync = createAsyncThunk(
   "postChangeCartAsync",
   (param) => {
-    return postChangeCartAsync(param); // 이부분 나중에 문제생기면 한번 봐야할듯 gpt는 여기를 자기 자신 호출하고 있다고 말함
+    return postChangeCart(param); //
   }
 );
 
@@ -55,3 +55,5 @@ const cartSlice = createSlice({
 });
 
 export default cartSlice.reducer;
+
+// 여기도 다시 확인

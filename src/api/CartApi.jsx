@@ -17,3 +17,5 @@ export const postChangeCart = async (cartItem) => {
 
   // 모든 데이터를 리덕스 같은거로 관리하려는 생각은 위험하다
 };
+
+// 여기도 다시 보기

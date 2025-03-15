@@ -1,5 +1,6 @@
 import React from "react";
 import BasicMenu from "../components/menus/BasicMenu.jsx";
+import CartComponent from "../components/menus/CartComponent.jsx";
 
 function BasicLayout({ children }) {
   return (
@@ -13,7 +14,7 @@ function BasicLayout({ children }) {
           {children}
         </main>
         <aside className="bg-green-300 md:w-1/3 lg:w-1/4 px-5 py-40">
-          <h1 className="text-2xl md:text-4xl"> Sidebar </h1>
+          <CartComponent />
         </aside>
       </div>
     </div>

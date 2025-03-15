@@ -3,6 +3,7 @@ import { postAdd } from "../../api/productsApi";
 import FetchingModal from "../common/FetchingModal";
 import ResultModal from "../common/ResultModal";
 import useCustomMove from "../../hooks/useCustomMove";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const initState = {
   // 상품 정보에 관한 초기 배열
@@ -22,11 +23,16 @@ function AddComponent(props) {
 
   const uploadRef = useRef();
 
-  const [fetching, setFetching] = useState(false); // 패칭모달(로딩중) 보여지게 하는거
+  // const [fetching, setFetching] = useState(false); // 패칭모달(로딩중) 보여지게 하는거
+  // useMutation 쓰면서 fetching과 setFetching 필요 없어짐
 
-  const [result, setResult] = useState(false); // 결과끝나면 모달창 보여지게 하기
+  // const [result, setResult] = useState(false); // 결과끝나면 모달창 보여지게 하기
 
   const { moveToList } = useCustomMove();
+
+  const addMutation = useMutation({
+    mutationFn: (product) => postAdd(product),
+  });
 
   // multipart/form-data FormData()
 
@@ -58,22 +64,43 @@ function AddComponent(props) {
     //formData.append("pname", product.pname);
     console.log(formData);
 
-    setFetching(true);
+    // setFetching(true);
 
-    postAdd(formData).then((data) => {
-      setFetching(false);
-      console.log("postAdd 서버응답값 : ", data);
-      setResult(data.result); // 여기 data.RESULT 였는데 뭐가 맞는걸까
-    });
+    addMutation.mutate(formData);
+
+    // useMutation 사용하면 아래 코드처럼 직접 호출 안해도 됨
+    // postAdd(formData).then((data) => {
+    //   setFetching(false);
+    //   console.log("postAdd 서버응답값 : ", data);
+    //   setResult(data.result); // 여기 data.RESULT 였는데 뭐가 맞는걸까
+    // });
   };
 
+  // 상품을 새로 등록했을 때 invalidQuery 설정 때문에 리스트의 1페이지로 넘어가도 방금 등록한 게시물이 보이지 않음
+  // 이 때문에 또 서버가 가지고 있는 데이터를 무효화 시키고 다시 가져오도록 지시해야 함
+  const queryClient = useQueryClient();
+
   const closeModal = () => {
-    setResult(null);
-    moveToList({ page: 1 });
+    queryClient.invalidateQueries("products/list");
+    // setResult(null);
+    moveToList({ page: 1 }); // 리스트의 1페이지로 이동
   };
 
   return (
     <div className="border-2 border-sky-200 mt-10 m-2 p-4">
+      {/* {} */}
+      {addMutation.isPending ? <FetchingModal /> : <></>}
+
+      {addMutation.isSuccess ? (
+        <ResultModal
+          title={"Product Add Result"}
+          content={`${addMutation.data.result}번 상품 등록 완료`}
+          callbackFn={closeModal}
+        />
+      ) : (
+        <></>
+      )}
+
       <div className="flex justify-center">
         <div className="relative mb-4 flex w-full flex-wrap items-stretch">
           <div className="w-1/5 p-6 text-right font-bold">Product Name</div>
@@ -138,18 +165,6 @@ function AddComponent(props) {
           </button>
         </div>
       </div>
-
-      {fetching ? <FetchingModal /> : <></>}
-
-      {result ? (
-        <ResultModal
-          callbackFn={closeModal}
-          title={"Product Add Result"}
-          content={`${result}번 상품 등록 완료`}
-        ></ResultModal>
-      ) : (
-        <></>
-      )}
     </div>
   );
 }
