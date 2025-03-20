@@ -2,12 +2,14 @@ import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { login, logout } from "../../slices/loginSlice";
 import { Link } from "react-router-dom";
+import useCustomLogin from "../../hooks/useCustomLogin";
 
 const BasicMenu = () => {
   const dispatch = useDispatch();
 
   // 🚀 Redux 상태 가져오기 (TypeScript 문법 제거)
-  const loginState = useSelector((state) => state.loginSlice);
+  // const loginState = useSelector((state) => state.loginSlice);
+  const { loginState } = useCustomLogin();
 
   // Redux 상태 전체 확인
   console.log(

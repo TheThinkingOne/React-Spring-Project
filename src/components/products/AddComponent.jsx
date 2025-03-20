@@ -16,7 +16,7 @@ const initState = {
 // Multipart Form Data 사용 필
 // new FormData() -> POST, PUT
 
-function AddComponent(props) {
+const AddComponent = () => {
   // 상품 데이터 정의
 
   const [product, setProduct] = useState(initState);
@@ -167,6 +167,6 @@ function AddComponent(props) {
       </div>
     </div>
   );
-}
+};
 
 export default AddComponent;

@@ -9,11 +9,11 @@ function KaKaoRedirectPage(props) {
   //
   const [searchParams] = useSearchParams();
 
-  const { moveToPath } = useCustomLogin();
+  const { moveToPath, saveAsCookie } = useCustomLogin();
 
   const authCode = searchParams.get("code");
 
-  const dispatch = useDispatch();
+  //const dispatch = useDispatch();
 
   // 여기서 카카오 엑세스 토큰을 받을 때 useEffect를 사용하는 이유가 뭘까?
   useEffect(() => {
@@ -53,7 +53,10 @@ function KaKaoRedirectPage(props) {
       getMemberWithAccessToken(accessToken).then((memberInfo) => {
         console.log("------------------");
         console.log(memberInfo);
-        dispatch(login(memberInfo)); // 이 부분을 인식 못하고 있다는데 왜지
+
+        saveAsCookie(memberInfo);
+
+        //dispatch(login(memberInfo)); // 이 부분을 인식 못하고 있다는데 왜지
 
         if (memberInfo && memberInfo.social) {
           // 소셜 로그인 유저라면

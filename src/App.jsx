@@ -15,14 +15,10 @@ const queryClient = new QueryClient();
 
 function App() {
   return (
-    <>
-      {/* <BasicMenu /> */}
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={root} />
-        <ReactQueryDevtools initialIsOpen={true}></ReactQueryDevtools>
-        {/*개발자 도구 관련 설정 (아래에 뜸)*/}
-      </QueryClientProvider>
-    </>
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={root} />
+      <ReactQueryDevtools initialIsOpen={true} />
+    </QueryClientProvider>
   );
 }
 

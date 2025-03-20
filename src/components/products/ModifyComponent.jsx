@@ -4,6 +4,7 @@ import FetchingModal from "../common/FetchingModal";
 import useCustomMove from "../../hooks/useCustomMove";
 import ResultModal from "../common/ResultModal";
 import { getOne, deleteOne, putOne } from "../../api/productsApi";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const initState = {
   pno: 0,
@@ -16,7 +17,7 @@ const initState = {
 
 const host = API_SERVER_HOST;
 
-function ModifyComponent({ pno }) {
+const ModifyComponent = ({ pno }) => {
   const [product, setProduct] = useState(initState); // 이 문법의 의미? 유즈스테이트 쓰고 없으면 initState 쓰라?
 
   const [fetching, setFetching] = useState(false);
@@ -25,16 +26,37 @@ function ModifyComponent({ pno }) {
 
   const { moveToList, moveToRead } = useCustomMove();
 
+  // 삭제 mutation const 설정
+  const delMutation = useMutation({ mutationFn: (pno) => deleteOne(pno) });
+
+  // 수정 mutation const 설정
+  const modMutation = useMutation({
+    mutationFn: (pno) => putOne(pno, product),
+  });
+
   const uploadRef = useRef();
 
-  useEffect(() => {
-    setFetching(true);
+  // 5버전 기준
+  const query = useQuery({
+    queryKey: ["products", pno],
+    queryFn: () => getOne(pno),
+    staleTime: Infinity, // 상품 수정 중에는 fresh 해서 가져오지 않도록 설정
+  });
 
-    getOne(pno).then((data) => {
-      setProduct(data);
-      setFetching(false);
-    });
-  }, [pno]);
+  // useEffect(() => {
+  //   setFetching(true);
+
+  //   getOne(pno).then((data) => {
+  //     setProduct(data);
+  //     setFetching(false);
+  //   });
+  // }, [pno]);
+
+  useEffect(() => {
+    if (query.isSuccess) {
+      setProduct(query.data);
+    }
+  }, [pno, query.data, query.isSuccess]);
 
   const handleChangeProduct = (e) => {
     // 이건 ok
@@ -77,38 +99,67 @@ function ModifyComponent({ pno }) {
     setFetching(true);
 
     // 이 부분이 아마 수정창에서 이미지 넣었을 때 새로 나타나게 하는 부분인듯
-    putOne(pno, formData).then((data) => {
-      setResult("Modified");
-      setFetching(false);
-    });
+    // mutation 사용할거라 필요 X
+    // putOne(pno, formData).then((data) => {
+    //   setResult("Modified");
+    //   setFetching(false);
+    // });
+
+    // mutation 관련 modify(수정 코드)
+    modMutation.mutate(formData);
   };
 
   const handleClickDelete = () => {
-    setFetching(true);
-    deleteOne(pno).then((data) => {
-      setResult("Deleted");
-      setFetching(false);
-    });
+    // mutation 사용할거라 필요 X
+    // setFetching(true);
+    // deleteOne(pno).then((data) => {
+    //   setResult("Deleted");
+    //   setFetching(false);
+    // });
+    delMutation.mutate(pno);
   };
 
+  const queryClient = useQueryClient();
+
   const closeModal = () => {
-    if (result === "Modified") {
-      moveToRead(pno);
-    } else if (result == "Deleted") {
-      moveToList({ page: 1 });
+    // 이 부분 다시 공부해야 할듯 동작 원리 아직 잘 몰겠음
+
+    queryClient.invalidateQueries(["products", pno]);
+    queryClient.invalidateQueries("products/list");
+    if (delMutation.isSuccess) {
+      moveToList(); // 삭제 되면 리스트 첫 페이지로 이동
     }
-    setResult(null);
+
+    if (modMutation.isSuccess) {
+      moveToRead(pno); // 수정 되면 수정한 해당 게시글 보기로 이동
+    }
   };
 
   return (
     <div className="border-2 border-sky-200 mt-10 m-2 p-4">
       {/* 로딩 중일 때 FetchingModal 표시 */}
-      {fetching ? <FetchingModal /> : <></>}
+      {/* {fetching ? <FetchingModal /> : <></>}
 
       {result ? (
         <ResultModal
           title={`${result}`}
           content={"처리되었습니다."}
+          callbackFn={closeModal}
+        ></ResultModal>
+      ) : (
+        <></>
+      )} */}
+
+      {query.isFetching || delMutation.isPending || modMutation.isPending ? (
+        <FetchingModal />
+      ) : (
+        <></>
+      )}
+
+      {delMutation.isSuccess || modMutation.isSuccess ? (
+        <ResultModal
+          title={"처리 결과"}
+          content={"정상적으로 처리되었습니다."}
           callbackFn={closeModal}
         ></ResultModal>
       ) : (
@@ -242,7 +293,7 @@ function ModifyComponent({ pno }) {
       </div>
     </div>
   );
-}
+};
 
 // 로그인 로그아웃 정도가 상태 데이터다
 
