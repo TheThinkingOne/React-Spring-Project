@@ -8,12 +8,15 @@ import { useRecoilState, useResetRecoilState } from "recoil";
 import { signinState } from "../atoms/signinState";
 import { removeCookie, setCookie } from "../util/cookieUtil";
 import { loginPost } from "../api/memberApi";
+import { cartState } from "../atoms/cartState";
 
 const useCustomLogin = () => {
   //
   const [loginState, setLoginState] = useRecoilState(signinState);
 
   const resetState = useResetRecoilState(signinState); // 이게 다라고? ㅅㅂ
+
+  const resetCartState = useResetRecoilState(cartState); // 장바구니 지우기
 
   const navigate = useNavigate();
 
@@ -52,9 +55,10 @@ const useCustomLogin = () => {
 
   // 로그아웃 수행 함수
   const doLogout = () => {
-    // dispatch(logout());
+    // 로그아웃하면 쿠키정보, 로그인정보, 카트정보 삭제
     removeCookie("member");
     resetState();
+    resetCartState();
   };
 
   const saveAsCookie = (data) => {

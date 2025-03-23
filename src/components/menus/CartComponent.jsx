@@ -4,22 +4,28 @@ import { useDispatch, useSelector } from "react-redux";
 import { getCartItemsAsync } from "../../slices/cartSlice.jsx";
 import useCustomCart from "../../hooks/useCustomCart.jsx";
 import CartItemComponent from "../cart/CartItemComponent.jsx";
+import { useRecoilValue } from "recoil";
+import { cartTotalState } from "../../atoms/cartState.jsx";
 
-function CartComponent(props) {
+const CartComponent = () => {
   const { isLogin, loginState } = useCustomLogin();
+
+  const { cartItems, changeCart } = useCustomCart();
+
+  const totalValue = useRecoilValue(cartTotalState);
 
   //const dispatch = useDispatch();
 
   //const cartItems = useSelector((state) => state.cartSlice);
 
-  const { refreshCart, cartItems, changeCart } = useCustomCart(); // 이 두개 뭔지 좀 봐야할듯
+  // const { refreshCart, cartItems, changeCart } = useCustomCart(); // 이 두개 뭔지 좀 봐야할듯
 
-  useEffect(() => {
-    if (isLogin) {
-      //dispatch(getCartItemsAsync());
-      refreshCart();
-    }
-  }, [isLogin]);
+  // useEffect(() => {
+  //   if (isLogin) {
+  //     //dispatch(getCartItemsAsync());
+  //     refreshCart();
+  //   }
+  // }, [isLogin]);
 
   return (
     <div className="w-full">
@@ -51,6 +57,6 @@ function CartComponent(props) {
       )}
     </div>
   );
-}
+};
 
 export default CartComponent;
